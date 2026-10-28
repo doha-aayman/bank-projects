@@ -13,6 +13,11 @@ const section3 = document.querySelector("#section--3");
 const btnOpenModel = document.querySelector(".btn--show-modal");
 const btnCloseModel = document.querySelector(".btn--close-modal");
 const btnScrollTo = document.querySelector(".btn--scroll-to");
+const featuresImg = document.querySelectorAll(".features__img");
+const slides = document.querySelectorAll('slider');
+const btnLeft = document.querySelector('slider__btn--left')
+const btnRight = document.querySelector('slider__btn--right')
+
 
 btnScrollTo.addEventListener("click", function (e) {
   const s1coords = section1.getBoundingClientRect();
@@ -31,14 +36,18 @@ btnScrollTo.addEventListener("click", function (e) {
   section1.scrollIntoView({ behavior: "smooth" });
 });
 
-// document.querySelectorAll(".nav__link").forEach(function (el) {
-//   el.addEventListener("click", function (e) {
-//     e.preventDefault();
+//Event propagation: bubbling and capturing
 
-//     const id = this.getAttribute("href");
-//     document.querySelector(id).scrollIntoView({ behavior: "smooth" });
-//   });
-// });
+/*
+document.querySelectorAll(".nav__link").forEach(function (el) {
+  el.addEventListener("click", function (e) {
+    e.preventDefault();
+
+    const id = this.getAttribute("href");
+    document.querySelector(id).scrollIntoView({ behavior: "smooth" });
+  });
+});
+*/
 
 navLinks.addEventListener("click", function (e) {
   //event delegation
@@ -114,18 +123,18 @@ const headerOpserver = new IntersectionObserver(stickyNav, {
 headerOpserver.observe(header);
 
 //reveal sections
-
-const revealSection1 = function (entries, observer) {
-  const [entry] = entries;
-  if (!entry.isIntersecting) return;
-  entry.target.classList.remove("section--hidden");
-  observer.unobserve(entry.target);
-};
+/* const revealSection1 = function (entries, observer) {
+   const [entry] = entries;
+   console.log(entry.target);
+   if (!entry.isIntersecting) return;
+   entry.target.classList.remove("section--hidden");
+   observer.unobserve(entry.target);
+ };*/
 
 const revealSection = function (entries, observer) {
   entries.forEach((entry) => {
     if (!entry.isIntersecting) return;
-    
+
     entry.target.classList.remove("section--hidden");
     observer.unobserve(entry.target);
   });
@@ -140,3 +149,32 @@ sections.forEach(function (sec) {
   sectionObserver.observe(sec);
   sec.classList.add("section--hidden");
 });
+
+//lazy loading images
+const loadImg = function (entries, observer) {
+  entries.forEach((entry) => {
+    if (!entry.isIntersecting) return;
+
+    entry.target.src = entry.target.dataset.src;
+    
+    entry.target.addEventListener("load", function () {
+      entry.target.classList.remove("lazy-img");
+    });
+
+    observer.unobserve(entry.target);
+  });
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0.3,
+});
+
+featuresImg.forEach((img) => imgObserver.observe(img));
+
+// building a slidercomponaent 
+
+slides.forEach((s ,i) => s.style.transform =`translateX(${100*i}%)`);
+
+
+
